@@ -43,7 +43,7 @@ AM_PROG_LIBTOOL
 dnl ==============================================
 dnl Check for vala
 dnl ==============================================
-AM_PROG_VALAC([0.10.2])
+AM_PROG_VALAC([0.10.0])
 
 AM_SILENT_RULES([yes])
 
