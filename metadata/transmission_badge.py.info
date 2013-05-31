@@ -1,0 +1,6 @@
+[DockmanagerHelper]
+Name=Transmission
+Description=Show transfer rates
+Icon=transmission
+AppName=transmission
+DBusName=com.transmissionbt.Transmission

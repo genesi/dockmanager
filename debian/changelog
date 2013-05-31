@@ -1,0 +1,11 @@
+dockmanager (0.1.1~bzr97-0~10.04~dockers1) lucid; urgency=low
+
+  * New development release of lp:dockmanager bzr97
+
+ -- Rico Tzschichholz <ricotz@ubuntu.com>  Mon, 08 Aug 2011 09:17:27 +0200
+
+dockmanager (0.1.0-0ubuntu1) natty; urgency=low
+
+  * Initial release (LP: #724040)
+
+ -- Rico Tzschichholz <ricotz@ubuntu.com>  Thu, 24 Feb 2011 01:36:22 +0100

@@ -1,0 +1,5 @@
+[DockmanagerHelper]
+Name=MPD Control
+Description=Control the Music Player Daemon
+Icon=media-playback-start
+AppName=mpd

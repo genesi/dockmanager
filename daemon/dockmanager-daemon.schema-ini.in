@@ -1,0 +1,9 @@
+# DockManager daemon configuration schema
+# -------------------------------------------
+# schema metadata
+[DEFAULT/helper_list]
+type=list-string
+default=
+description=List of active helpers.
+
+# vim: set ft=cfg :

@@ -1,0 +1,5 @@
+[DockmanagerHelper]
+Name=Open Terminal Here
+Description=Opens a terminal at the selected location
+Icon=gnome-terminal
+AppName=gnome-terminal

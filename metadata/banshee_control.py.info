@@ -1,0 +1,6 @@
+[DockmanagerHelper]
+Name=Banshee Controls
+Description=Control Banshee media playback
+Icon=banshee
+AppName=banshee-1
+DBusName=org.bansheeproject.Banshee

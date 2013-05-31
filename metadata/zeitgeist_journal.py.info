@@ -1,0 +1,4 @@
+[DockmanagerHelper]
+Name=Zeitgeist Journal
+Description=Provides a journal of all activity for the selected application supplied by Zeitgeist
+AppName=zeitgeist-daemon

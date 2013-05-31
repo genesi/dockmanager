@@ -1,0 +1,6 @@
+[DockmanagerHelper]
+Name=Workrave Helper
+Description=Show Workrave timers
+AppName=workrave
+Icon=/usr/share/pixmaps/workrave/workrave.xpm
+DBusName=org.workrave.Workrave

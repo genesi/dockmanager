@@ -1,0 +1,6 @@
+[DockmanagerHelper]
+Name=Pithos Controls
+Description=Control Pithos playback
+Icon=/usr/share/pithos/media/icon.svg
+AppName=pithos
+DBusName=net.kevinmehall.Pithos

@@ -1,0 +1,6 @@
+[DockmanagerHelper]
+Name=Clementine Controls
+Description=Control Clementine media playback
+Icon=application-x-clementine
+AppName=clementine
+DBusName=org.mpris.MediaPlayer2.clementine

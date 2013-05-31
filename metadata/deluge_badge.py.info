@@ -1,0 +1,5 @@
+[DockmanagerHelper]
+Name=Deluge
+Description=Show transfer rates and Pause All/Resume All buttons. You have to run deluge daemonized: sudo apt-get install deluged && deluged
+Icon=deluge
+AppName=deluge

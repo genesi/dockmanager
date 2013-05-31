@@ -1,0 +1,5 @@
+[DockmanagerHelper]
+Name=Terminal Server Client
+Description=Jump directly to Terminal Server Client bookmarks
+Icon=tsclient
+AppName=tsclient

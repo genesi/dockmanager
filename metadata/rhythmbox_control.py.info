@@ -1,0 +1,6 @@
+[DockmanagerHelper]
+Name=Rhythmbox Controls
+Description=Control Rhythmbox media playback
+Icon=rhythmbox
+AppName=rhythmbox
+DBusName=org.gnome.Rhythmbox

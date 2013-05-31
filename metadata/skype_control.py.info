@@ -1,0 +1,6 @@
+[DockmanagerHelper]
+Name=Skype controls
+Description=Control your availability and connectivity status on Skype
+Icon=skype
+AppName=skype
+DBusName=com.Skype.API

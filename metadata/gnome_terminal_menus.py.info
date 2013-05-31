@@ -1,0 +1,5 @@
+[DockmanagerHelper]
+Name=Gnome-Terminal Helper
+Description=Open terminal profiles
+Icon=terminal
+AppName=gnome-terminal

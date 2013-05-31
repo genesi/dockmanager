@@ -1,0 +1,232 @@
+#  
+#  Copyright (C) 2009-2010 Jason Smith, Robert Dyer
+# 
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+# 
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+# 
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+import gobject
+import time
+import glib
+import dbus
+import dbus.glib
+import sys
+import urllib
+import os
+import subprocess
+
+
+DOCKMANAGER_BUS   = 'net.launchpad.DockManager'
+DOCKMANAGER_PATH  = '/net/launchpad/DockManager'
+DOCKMANAGER_IFACE = 'net.launchpad.DockManager'
+
+DOCKITEM_IFACE    = 'net.launchpad.DockItem'
+
+RESOURCESDIR = "@PKGDATADIR@/data"
+
+class DockManagerItem():
+	def __init__(self, sink, path):
+		self.sink = sink;
+		self.path = path
+		self.bus = dbus.SessionBus()
+		self.id_map = {}
+		self.id_info = {}
+		
+		try:
+			obj = self.bus.get_object(DOCKMANAGER_BUS, self.path)
+			self.iface = dbus.Interface(obj, DOCKITEM_IFACE)
+
+			self.bus.add_signal_receiver(self.menu_pressed_signal, "MenuItemActivated", DOCKITEM_IFACE, DOCKMANAGER_BUS, self.path)
+			if "x-docky-uses-menu-confirmation" in self.sink.capabilities:
+				self.bus.add_signal_receiver(self.menu_item_confirmation_needed, "MenuItemConfirmationNeeded", DOCKITEM_IFACE, DOCKMANAGER_BUS, self.path)
+		except dbus.DBusException, e:
+			print "DockManagerItem(): %s" % e
+			sys.exit(0)
+		
+	def add_menu_item(self, name, icon, group=None):
+		try:
+			hints = {"label":name}
+			if group:
+				hints["container-title"] = group
+			if icon and not icon == "":
+				hint = "icon-name" if not os.path.isabs(icon) else "icon-file"
+				hints[hint] = icon
+			menu_id = self.iface.AddMenuItem(hints)
+		except dbus.DBusException, e:
+			return None
+		self.id_map[menu_id] = name
+		return menu_id
+
+	def add_menu_item_uri(self, uri, group, title=None):
+		try:
+			if "menu-item-with-uri" in self.sink.capabilities:
+				menu_id = self.iface.AddMenuItem({"uri":uri, "container-title":group})
+				self.id_map[menu_id] = uri
+				return menu_id
+		except dbus.DBusException, e:
+			return None
+		return add_menu_item(title or uri, None, group)
+
+	def remove_menu_item(self, menu_id):
+		if menu_id in self.id_map:
+			try:
+				self.iface.RemoveMenuItem(menu_id)
+			except dbus.DBusException, e:
+				return None
+			del self.id_map[menu_id]
+
+	def menu_pressed_signal(self, menu_id):
+		if self.id_map.has_key(menu_id):
+			self.menu_pressed(menu_id)
+	
+	def menu_pressed(self, menu_id):
+		if self.id_info.has_key(menu_id):
+			subprocess.Popen(['xdg-open', self.id_info[menu_id]])
+	
+	def menu_item_confirmation_needed(self):
+		if "x-docky-uses-menu-confirmation" in self.sink.capabilities:
+			for menu_id, title in self.id_map.iteritems():
+				try:
+					self.iface.ConfirmMenuItem(menu_id)
+				except dbus.DBusException, e:
+					pass
+	
+	def set_tooltip(self, text):
+		if ("dock-item-tooltip" in self.sink.capabilities):
+			try:
+				self.iface.UpdateDockItem({"tooltip":text})
+			except dbus.DBusException, e:
+				pass
+	
+	def reset_tooltip(self):
+		self.set_tooltip("")
+	
+	def set_badge(self, text):
+		if ("dock-item-badge" in self.sink.capabilities):
+			try:
+				self.iface.UpdateDockItem({"badge":text})
+			except dbus.DBusException, e:
+				pass
+	
+	def reset_badge(self):
+		self.set_badge("")
+	
+	def set_icon(self, icon):
+		if ("dock-item-icon-file" in self.sink.capabilities):
+			try:
+				self.iface.UpdateDockItem({"icon-file":icon})
+			except dbus.DBusException, e:
+				pass
+	
+	def reset_icon(self):
+		self.set_icon("")
+	
+	def set_attention(self):
+		if ("dock-item-attention" in self.sink.capabilities):
+			try:
+				self.iface.UpdateDockItem({"attention":True})
+			except dbus.DBusException, e:
+				pass
+	
+	def unset_attention(self):
+		if ("dock-item-attention" in self.sink.capabilities):
+			try:
+				self.iface.UpdateDockItem({"attention":False})
+			except dbus.DBusException, e:
+				pass
+	
+	def set_waiting(self):
+		if ("dock-item-waiting" in self.sink.capabilities):
+			try:
+				self.iface.UpdateDockItem({"waiting":True})
+			except dbus.DBusException, e:
+				pass
+	
+	def unset_waiting(self):
+		if ("dock-item-waiting" in self.sink.capabilities):
+			try:
+				self.iface.UpdateDockItem({"waiting":False})
+			except dbus.DBusException, e:
+				pass
+	
+	def set_progress(self, progress):
+		if ("dock-item-progress" in self.sink.capabilities):
+			try:
+				self.iface.UpdateDockItem({"progress":progress})
+			except dbus.DBusException, e:
+				pass
+	
+	def reset_progress(self):
+		self.set_progress(-1)
+	
+	def dispose(self):
+		try:
+			self.reset_tooltip()
+			self.reset_badge()
+			self.reset_icon()
+			for menu_id in self.id_map.keys():
+				self.iface.RemoveMenuItem(menu_id)
+		except dbus.DBusException, e:
+			return
+
+
+class DockManagerSink():
+	def __init__(self):
+		self.bus = dbus.SessionBus()
+		self.capabilities = []
+		self.items = {}
+
+		try:
+			obj = self.bus.get_object(DOCKMANAGER_BUS, DOCKMANAGER_PATH)
+			iface = dbus.Interface(obj, DOCKMANAGER_IFACE)
+
+			self.capabilities = iface.GetCapabilities()
+
+			for pathtoitem in iface.GetItems():
+				self.item_added(pathtoitem)
+
+			self.bus.add_signal_receiver(self.item_added,   "ItemAdded",   DOCKMANAGER_IFACE, DOCKMANAGER_BUS, DOCKMANAGER_PATH)
+			self.bus.add_signal_receiver(self.item_removed, "ItemRemoved", DOCKMANAGER_IFACE, DOCKMANAGER_BUS, DOCKMANAGER_PATH)
+
+			self.bus.add_signal_receiver(self.name_owner_changed_cb, dbus_interface='org.freedesktop.DBus', signal_name='NameOwnerChanged')
+		except dbus.DBusException, e:
+			print "DockManagerSink(): %s" % e
+			sys.exit(0)
+
+	def item_path_found(self, path, item):
+		pass
+	
+	def item_added(self, path):
+		obj = self.bus.get_object(DOCKMANAGER_BUS, path)
+		item = dbus.Interface(obj, DOCKITEM_IFACE)
+		self.item_path_found(path, item)
+
+	def item_removed(self, path):
+		if path in self.items:
+			self.items[path].dispose()
+			del self.items[path]
+
+	def name_owner_changed_cb(self, name, old_owner, new_owner):
+		if name == DOCKMANAGER_BUS and not new_owner:
+			print "DockManagerDBus %s is gone, quitting now..." % name
+			self.shut_down()				
+	
+	def dispose(self):
+		self.bus.remove_signal_receiver(self.item_added,   "ItemAdded",   DOCKMANAGER_IFACE, DOCKMANAGER_BUS, DOCKMANAGER_PATH)
+		self.bus.remove_signal_receiver(self.item_removed, "ItemRemoved", DOCKMANAGER_IFACE, DOCKMANAGER_BUS, DOCKMANAGER_PATH)
+		for path in self.items.keys():
+			self.item_removed(path)
+	
+	def shut_down(self):
+		gobject.idle_add(quit, 1)
+

@@ -1,0 +1,4 @@
+[DockmanagerHelper]
+Name=Zeitgeist Integration
+Description=Interfaces with Zeitgeist to supply a list of most used items for an application
+AppName=zeitgeist-daemon
