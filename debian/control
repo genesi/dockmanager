@@ -24,7 +24,6 @@ Depends: python,
  python-dockmanager,
  python-mpd,
  python-mutagen,
- zeitgeist,
  ${misc:Depends}
 XB-Python-Version: ${python:Versions}
 Description: Helpers for your Dock

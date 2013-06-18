@@ -1,3 +1,9 @@
+dockmanager (0.1.1~bzr97-0~10.10~genesi1) maverick; urgency=low
+
+  * Remove zeitgeist dependancy
+
+ -- Ahmed Ammar <aammar@genesi-usa.com>  Tue, 18 Jun 2013 13:17:27 +0200
+
 dockmanager (0.1.1~bzr97-0~10.04~dockers1) lucid; urgency=low
 
   * New development release of lp:dockmanager bzr97
